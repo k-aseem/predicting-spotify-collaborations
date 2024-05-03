@@ -1,0 +1,47 @@
+# pip install pandas nltk matplotlib wordcloud regex seaborn streamlitç
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
+import nltk
+import re
+from wordcloud import WordCloud
+import streamlit as st
+
+def clean_words(song_titles):
+    nltk_stopwords = nltk.corpus.stopwords.words('english')
+    words_list = [x.lower() for i in song_titles for x in nltk.word_tokenize(i)]
+    words_alpha = [i for i in words_list if not re.match('^[^a-z]+$', i)]
+    word_list_final = [i for i in words_alpha if not i in nltk_stopwords]
+    remove_words = ["feat","remix","edit","version","radio","'s","mix","n't","u","'m"]
+    word_list_final = [i for i in word_list_final if not i in remove_words]
+    return word_list_final
+
+def generate_wordcloud(word_list_final):
+    token_str = ' '.join(word_list_final)
+    song_title_wordcloud = WordCloud(background_color='black', margin=2).generate(token_str)
+    return song_title_wordcloud
+
+def generate_word_freq(word_list_final):
+    feq_dist = nltk.FreqDist(word_list_final)
+    feq_dist_df = feq_dist.most_common(10)
+    songs_word_freq = pd.DataFrame(feq_dist_df,columns = ['Word','Count'])
+    songs_word_freq.to_csv("songs_word_freq.csv")
+    return songs_word_freq
+
+def main():
+    try:
+        spotify_songs_data = pd.read_csv("Datasets/30000 Spotify Songs/spotify_songs.csv")
+        song_titles = spotify_songs_data["track_name"].astype('str')
+        word_list_final = clean_words(song_titles)
+        song_title_wordcloud = generate_wordcloud(word_list_final)
+        songs_word_freq = generate_word_freq(word_list_final)
+
+        st.title("Spotify Songs Analysis")
+        st.image(song_title_wordcloud.to_array())
+        st.dataframe(songs_word_freq)
+    except FileNotFoundError:
+        st.error("The file was not found")
+
+if __name__ == "__main__":
+    main()
