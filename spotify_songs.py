@@ -19,7 +19,7 @@ def clean_words(song_titles):
 
 def generate_wordcloud(word_list_final):
     token_str = ' '.join(word_list_final)
-    song_title_wordcloud = WordCloud(background_color='black', margin=2).generate(token_str)
+    song_title_wordcloud = WordCloud(background_color='black', margin=2, width=800, height=400).generate(token_str)
     return song_title_wordcloud
 
 def generate_word_freq(word_list_final):
@@ -32,14 +32,25 @@ def generate_word_freq(word_list_final):
 def main():
     try:
         spotify_songs_data = pd.read_csv("Datasets/30000 Spotify Songs/spotify_songs.csv")
+        
+        # Get unique genres and add "All" as the first option
+        genres = spotify_songs_data["playlist_genre"].unique().tolist()
+        genres.insert(0, "All")
+
+        st.title("Spotify Songs Analysis")
+        # Create a dropdown for genre selection
+        selected_genre = st.selectbox("Select Genre", genres)
+
+        # Filter songs based on the selected genre
+        if selected_genre != "All":
+            spotify_songs_data = spotify_songs_data[spotify_songs_data["playlist_genre"] == selected_genre]
+
         song_titles = spotify_songs_data["track_name"].astype('str')
         word_list_final = clean_words(song_titles)
         song_title_wordcloud = generate_wordcloud(word_list_final)
-        songs_word_freq = generate_word_freq(word_list_final)
+        # songs_word_freq = generate_word_freq(word_list_final)
 
-        st.title("Spotify Songs Analysis")
         st.image(song_title_wordcloud.to_array())
-        st.dataframe(songs_word_freq)
     except FileNotFoundError:
         st.error("The file was not found")
 
