@@ -8,6 +8,14 @@ import re
 from wordcloud import WordCloud
 import streamlit as st
 
+@st.cache_data
+def load_data():
+    return pd.read_csv("Datasets/30000 Spotify Songs/spotify_songs.csv")
+
+@st.cache_data
+def load_common_neighbors_data():
+    return pd.read_csv("common_neighbor_centrality1.csv")
+
 def clean_words(song_titles):
     nltk_stopwords = nltk.corpus.stopwords.words('english')
     words_list = [x.lower() for i in song_titles for x in nltk.word_tokenize(i)]
@@ -31,7 +39,8 @@ def generate_word_freq(word_list_final):
 
 def main():
     try:
-        spotify_songs_data = pd.read_csv("Datasets/30000 Spotify Songs/spotify_songs.csv")
+        spotify_songs_data = load_data()
+        common_neighbors_data = load_common_neighbors_data()
         
         # Get unique genres and add "All" as the first option
         genres = spotify_songs_data["playlist_genre"].unique().tolist()
@@ -51,6 +60,21 @@ def main():
         # songs_word_freq = generate_word_freq(word_list_final)
 
         st.image(song_title_wordcloud.to_array())
+
+
+        # New section for artist selection
+        st.header("Spotify Collaborations Prediction")
+
+        suggestions = common_neighbors_data["artist_name"].tolist()
+        selected_artist = st.selectbox("Select Artist", [""] + suggestions)
+
+        # Display top 10 collaborations for selected artist
+        if selected_artist:
+            artist_data = common_neighbors_data[common_neighbors_data["artist_name"].str.strip().str.lower() == selected_artist.lower()]
+            top_links = artist_data.iloc[0]["top_links"].split(", ")[:10]
+            st.markdown("### Top 10 Potential Collaborations:")
+            for collaborator in top_links:
+                st.write(f"- {collaborator}")
     except FileNotFoundError:
         st.error("The file was not found")
 
