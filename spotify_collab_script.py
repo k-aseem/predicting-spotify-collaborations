@@ -148,7 +148,7 @@ def main():
         G = create_graph(nodes_df, edges_df)
 
         # New section for artist selection
-        st.header("Spotify Collaborations Prediction")
+        st.header("Spotify Artists Collaborations Prediction")
         artist_names = [data['name'] for node, data in G.nodes(data=True)]
         selected_artist = st.selectbox('Select an artist:', artist_names)
         #visualize_artist_graph(G, selected_artist)
