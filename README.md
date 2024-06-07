@@ -33,10 +33,11 @@ The project consists of two Python scripts:
 
 ## Screenshots
 
-(Add your screenshots here. You can use Markdown to add images. For example:)
+1. Spotify Artists Collaborations Prediction
+   ![Spotify Artists Collaborations Prediction](images/Spotify_Artists_Collaborations_Prediction.png)
 
-![Screenshot 1](images/Spotify Artists Collaborations Prediction.png.png)
-![Screenshot 2](images/Spotify Songs Analysis.png.png)
+2. Spotify Songs Analysis
+   ![Spotify Songs Analysis](images/Spotify_Songs_Analysis.png)
 
 ## Contributing
 
